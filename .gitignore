@@ -1,0 +1,8 @@
+# File di immagine disco e cartella ISO
+*.iso
+ISO/
+
+# File temporanei di sistema
+Thumbs.db
+desktop.ini
+.DS_Store
