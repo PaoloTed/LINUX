@@ -282,6 +282,13 @@ dmesg | grep -Ei 'uvcvideo|ipu'
 ```
 Se almeno **audio, sleep, touchpad, WiFi, camera** rispondono → si prosegue. Se l'audio non c'è, si prova prima con `snd_intel_dspcfg.dsp_driver=1` (HDA legacy) oppure `=3` (SOF) e si valuta se il progetto vale la pena.
 
+> [!NOTE]
+> **Nota Touchpad Goodix (`GXTP7863`):** Se in ambiente Live il touchpad non si muove, è dovuto a una race condition di inizializzazione I2C o all'Avvio Rapido di Windows. Sbloccalo subito con:
+> ```bash
+> sudo modprobe -r i2c_hid_acpi && sudo modprobe i2c_hid_acpi
+> ```
+
+
 ### Fase 2 — Kernel cucito (il cuore del "ultra-ottimizzato")
 ```bash
 # su una base rolling (Arch/Gentoo) o Ubuntu con defconfig

@@ -10,8 +10,17 @@
 2. [Fase 1: Preparazione su Windows (Prima di riavviare)](#fase-1-preparazione-su-windows-prima-di-riavviare)
 3. [Fase 2: Creazione Live USB e Avvio](#fase-2-creazione-live-usb-e-avvio)
 4. [Fase 3: Test Hardware in Ambiente Live (Checklist pre-installazione)](#fase-3-test-hardware-in-ambiente-live)
+   * 4.1 Connessione Wi-Fi
+   * 4.2 Audio (Intel SOF)
+   * 4.3 **[Touchpad Goodix GXTP7863: Sblocco in Live Mode](#33-touchpad-goodix-gxtp7863-luminosit-e-tasti-fn)** ⚠️
 5. [Fase 4: Installazione Dual Boot con Calamares (Passo-Passo)](#fase-4-installazione-dual-boot-con-calamares)
 6. [Fase 5: Ottimizzazioni Post-Installazione su CachyOS](#fase-5-ottimizzazioni-post-installazione-su-cachyos)
+   * 6.1 Sfasamento orologio Windows/Linux
+   * 6.2 Power Limits CPU (Silenziosità ventola)
+   * 6.3 Soglia batteria all'80%
+   * 6.4 Compressione zram
+   * 6.5 Controllo profili ventola ACPI/EC
+   * 6.6 **[Fix permanente Touchpad Goodix (Auto-rebind all'avvio)](#56-fix-permanente-per-il-touchpad-goodix-auto-rebind-allavvio)** 🛠️
 7. [Fase 6: Risoluzione Problemi e Manutenzione Dual Boot](#fase-6-risoluzione-problemi-e-manutenzione-dual-boot)
 
 ---
