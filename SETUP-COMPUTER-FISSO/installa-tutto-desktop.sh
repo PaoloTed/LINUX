@@ -59,7 +59,6 @@ sudo pacman -S --needed --noconfirm \
     vlc vlc-plugins-all \
     qbittorrent \
     telegram-desktop \
-    notepadqq \
     kate \
     filelight \
     btop fastfetch \
@@ -70,13 +69,24 @@ sudo pacman -S --needed --noconfirm \
 # ------------------------------------------------------------------------------
 echo ""
 echo "[4/11] Installazione applicazioni universitarie, comunicazione e media (AUR)..."
-yay -S --needed --noconfirm \
-    vesktop-bin \
-    zapzap-bin \
-    teams-for-linux \
-    outlook-for-linux-bin \
-    parsec-bin \
+AUR_PACKAGES=(
+    vesktop-bin
+    zapzap-bin
+    teams-for-linux
+    outlook-for-linux-bin
+    parsec-bin
     stremio
+    notepadqq
+)
+
+# Tenta prima l'installazione cumulativa, con fallback pacchetto per pacchetto in caso di problemi
+if ! yay -S --needed --noconfirm "${AUR_PACKAGES[@]}"; then
+    echo "Attenzione: Installazione cumulativa non completata al 100%, tento i singoli pacchetti..."
+    for pkg in "${AUR_PACKAGES[@]}"; do
+        echo "Installazione di $pkg da AUR..."
+        yay -S --needed --noconfirm "$pkg" || echo "Avviso: Impossibile installare $pkg da AUR al momento."
+    done
+fi
 
 # ------------------------------------------------------------------------------
 # 5. Configurazione Flatpak & ArtCraft Suite
@@ -216,6 +226,47 @@ git config --global init.defaultBranch main
 # Copia l'icona di Antigravity se presente negli asset
 if [ -f "$ASSETS_DIR/antigravity.png" ]; then
     cp "$ASSETS_DIR/antigravity.png" "$HOME/.local/share/icons/hicolor/512x512/apps/antigravity.png"
+fi
+
+# Configurazione e spostamento di Antigravity nella cartella applicazioni (~/.local/share/)
+ANTIGRAV_EXEC=""
+if [ -d "$HOME/Scaricati/Antigravity" ]; then
+    echo "Spostamento di Antigravity da Scaricati a ~/.local/share/Antigravity..."
+    mkdir -p "$HOME/.local/share/Antigravity"
+    cp -ru "$HOME/Scaricati/Antigravity/"* "$HOME/.local/share/Antigravity/" 2>/dev/null || true
+    chmod +x "$HOME/.local/share/Antigravity/antigravity" 2>/dev/null || true
+    chmod +x "$HOME/.local/share/Antigravity/Antigravity" 2>/dev/null || true
+    if [ -f "$HOME/.local/share/Antigravity/antigravity" ]; then
+        ANTIGRAV_EXEC="$HOME/.local/share/Antigravity/antigravity"
+    elif [ -f "$HOME/.local/share/Antigravity/Antigravity" ]; then
+        ANTIGRAV_EXEC="$HOME/.local/share/Antigravity/Antigravity"
+    else
+        ANTIGRAV_EXEC=$(find "$HOME/.local/share/Antigravity" -maxdepth 2 -type f -executable | head -n 1)
+    fi
+elif [ -f "$HOME/Scaricati/Antigravity" ]; then
+    echo "Spostamento dell'eseguibile Antigravity in ~/.local/bin/..."
+    mkdir -p "$HOME/.local/bin"
+    cp -u "$HOME/Scaricati/Antigravity" "$HOME/.local/bin/antigravity"
+    chmod +x "$HOME/.local/bin/antigravity"
+    ANTIGRAV_EXEC="$HOME/.local/bin/antigravity"
+elif [ -f "$HOME/.local/bin/antigravity" ]; then
+    ANTIGRAV_EXEC="$HOME/.local/bin/antigravity"
+fi
+
+if [ -n "$ANTIGRAV_EXEC" ]; then
+    cat << EOF > "$HOME/.local/share/applications/antigravity.desktop"
+[Desktop Entry]
+Type=Application
+Name=Antigravity
+GenericName=AI Agentic IDE
+Comment=Google Deepmind Antigravity IDE
+Exec=$ANTIGRAV_EXEC %U
+Icon=antigravity
+Terminal=false
+Categories=Development;IDE;
+StartupNotify=true
+EOF
+    chmod +x "$HOME/.local/share/applications/antigravity.desktop"
 fi
 
 # ------------------------------------------------------------------------------
