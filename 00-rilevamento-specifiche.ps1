@@ -1,4 +1,4 @@
-if (-not $Path) { $Path = Join-Path (Split-Path -Parent $MyInvocation.MyCommand.Path) '01-specifiche-rilevate.md' }
+if (-not $Path) { $parent = if ($MyInvocation.MyCommand.Path) { Split-Path -Parent $MyInvocation.MyCommand.Path } else { (Get-Location).Path }; $Path = Join-Path $parent '01-specifiche-rilevate.md' }
 # =====================================================================
 #  Rilevamento completo delle specifiche hardware del dispositivo
 #  Scope: process-level, nessun privilegio amministrativo richiesto.
@@ -104,7 +104,7 @@ $kv = [ordered]@{
     'GPU'                         = (($gpu | ForEach-Object { "$($_.Name) [driver $($_.DriverVersion), $($_.DriverDate.ToString('yyyy-MM-dd'))]" }) -join ' · ')
     'PCI ID GPU'                  = ($gpu | ForEach-Object { $_.PNPDeviceID } | Select-Object -First 1)
     'Display (modalita'' corrente)' = "$($gpu | Select-Object -First 1 | ForEach-Object { $_.VideoModeDescription })"
-    'Pannello interna (EDID)'     = ((Get-CimInstance -Namespace root\wmi -ClassName WmiMonitorID) | ForEach-Object { "Mfr=$(Vec $_.ManufacturerName) Product=$(Vec $_.ProductCodeID) Year=$($_.YearOfManufacture) Week=$($_.WeekOfManufacture)" } | Join-String -Separator ' · ')
+    'Pannello interna (EDID)'     = (((Get-CimInstance -Namespace root\wmi -ClassName WmiMonitorID) | ForEach-Object { "Mfr=$(Vec $_.ManufacturerName) Product=$(Vec $_.ProductCodeID) Year=$($_.YearOfManufacture) Week=$($_.WeekOfManufacture)" }) -join ' · ')
     'Disco'                       = (($disk | ForEach-Object { "$($_.Model) $($_.InterfaceType) $(Fmt-Size $_.Size) fw $($_.FirmwareRevision) sector $($_.BytesPerSector)" }) -join ' · ')
     'Disco fisico (Storage)'      = ((Get-PhysicalDisk | ForEach-Object { "$($_.FriendlyName) $($_.MediaType) $($_.BusType) health=$($_.HealthStatus)" }) -join ' · ')
     'Stile partizioni'            = ((Get-Disk | ForEach-Object { "Disk$($_.Number) $($_.PartitionStyle) boot=$($_.BootFromDisk)" }) -join ' · ')
