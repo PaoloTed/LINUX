@@ -67,3 +67,4 @@ if command -v systemctl >/dev/null 2>&1; then
 fi
 
 echo "[✓] Fatto! Le icone nella barra inferiore sono ora identiche a quelle del portatile."
+
