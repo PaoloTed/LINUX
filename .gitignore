@@ -6,3 +6,9 @@ ISO/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Sorgenti pesanti e build artifacts
+librealsense-2.50/
+librealsense-legacy/
+realsense-ir
+*.pkg.tar.zst

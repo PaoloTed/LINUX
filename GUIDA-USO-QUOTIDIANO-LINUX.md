@@ -7,7 +7,7 @@
 
 ## Indice dei Contenuti
 1. [Mentalità Linux: Come Orientarsi Rispetto a Windows](#1-mentalità-linux-come-orientarsi-rispetto-a-windows)
-2. [Gestione Pacchetti & Programmi (Pacman, Yay, Flatpak)](#2-gestione-pacchetti--programmi)
+2. [Gestione Pacchetti & Programmi (Pacman, Yay, File .tar.gz)](#2-gestione-pacchetti--programmi)
 3. [Cheatsheet Comandi da Terminale Indispensabili](#3-cheatsheet-comandi-da-terminale-indispensabili)
 4. [Scorciatoie e Produttività con KDE Plasma 6](#4-scorciatoie-e-produttività-con-kde-plasma-6)
 5. [Funzionalità Hardware del tuo MateBook D 15](#5-funzionalità-hardware-del-tuo-matebook-d-15)
@@ -74,6 +74,90 @@ L'AUR contiene praticamente qualsiasi software esistente al mondo (da WhatsApp a
 > [!IMPORTANT]
 > **Cosa fare se Yay si "blocca" mostrando una schermata di testo:**  
 > Se Yay apre il visualizzatore `less` per mostrarti il file di installazione, premi semplicemente la lettera **`q`** sulla tastiera per uscire e continuare l'installazione!
+
+---
+
+### C. Come Gestire e "Installare" i file `.tar.gz`
+
+Un file `.tar.gz` (o `.tgz`) in ambiente Linux è l'equivalente di un archivio **`.zip`** compresso: non è un pacchetto auto-installante (come un `.exe` o un `.pkg.tar.zst`), ma una cartella compressa.
+
+> [!TIP]
+> **Regola d'oro su Arch Linux / CachyOS:**  
+> Prima di installare a mano un `.tar.gz`, **cerca sempre se esiste già su AUR** (`yay -Ss nomeprogramma`). Nel 99% dei casi qualcuno ha già creato il pacchetto pronto: installarlo con `yay` ti garantisce aggiornamenti automatici e disinstallazione pulita con un clic.
+
+Se hai scaricato un `.tar.gz` dal web (es. da GitHub o dal sito di uno sviluppatore), ecco come procedere:
+
+#### Passo 1: Estrarre l'archivio
+* **Via interfaccia grafica:** Fai clic destro sul file `.tar.gz` in Dolphin e scegli **Estrai** ➔ **Estrai archivio qui** (usa *Ark* di KDE).
+* **Da terminale:**
+  ```bash
+  tar -xzvf nomefile.tar.gz
+  # Oppure usa l'alias rapido già presente in CachyOS:
+  untar nomefile.tar.gz
+  ```
+  *(Significato dei parametri: `-x` estrai, `-z` decomprimi gzip, `-v` mostra i file estratti, `-f` specifica il file).*
+
+---
+
+#### Passo 2: Capire cosa c'è dentro ed eseguire l'installazione
+Entra nella cartella appena estratta (`cd nomecartella`) e controlla i file con `ll`. Ti troverai di fronte a uno di questi **3 casi**:
+
+#### Caso 1: Programma precompilato "Portatile" (Il più comune: es. Blender, Telegram, IntelliJ, YGO Omega)
+L'archivio contiene già i file binari compilati ed eseguibili pronti all'uso.
+1. Individua l'eseguibile principale (solitamente ha il nome del programma o `start.sh` o `run.sh`).
+2. Rendilo eseguibile e avvialo:
+   ```bash
+   chmod +x nomeprogramma
+   ./nomeprogramma
+   ```
+3. **Come "installarlo" per bene nel sistema:**
+   Sposta la cartella in `/opt/` (per tutti gli utenti) o nella tua cartella `~/Programmi/`:
+   ```bash
+   sudo mv nomecartella /opt/nomeprogramma
+   ```
+   Puoi creare un collegamento rapido da terminale in `/usr/local/bin`:
+   ```bash
+   sudo ln -s /opt/nomeprogramma/eseguibile /usr/local/bin/nomeprogramma
+   ```
+   *(Ora puoi avviarlo semplicemente digitando `nomeprogramma` da qualsiasi terminale).*
+
+---
+
+#### Caso 2: C'è uno script di installazione (`install.sh` o `setup.sh`)
+Molti sviluppatori includono un piccolo script automatizzato:
+```bash
+chmod +x install.sh
+sudo ./install.sh
+```
+
+---
+
+#### Caso 3: Codice sorgente da compilare a mano (Tradizionale C/C++)
+Se dentro la cartella trovi file sorgente (`.c`, `.cpp`, `Makefile`, `configure` o `CMakeLists.txt`), il programma va compilato:
+
+* **Se c'è il file `configure`:**
+  ```bash
+  ./configure       # Verifica le dipendenze richieste
+  make              # Compila il codice sorgente
+  sudo make install # Copia i file compilati nel sistema (/usr/local/bin)
+  ```
+* **Se usa CMake (`CMakeLists.txt`):**
+  ```bash
+  cmake -B build
+  cmake --build build
+  sudo cmake --install build
+  ```
+
+---
+
+#### Cheat-sheet comandi rapidi per archivi
+
+| Azione | Comando | Alias CachyOS |
+|---|---|---|
+| **Estrarre `.tar.gz`** | `tar -xzvf archivio.tar.gz` | `untar archivio.tar.gz` |
+| **Estrarre `.tar.bz2`** | `tar -xjvf archivio.tar.bz2` | `untar archivio.tar.bz2` |
+| **Estrarre `.tar.xz`** | `tar -xJvf archivio.tar.xz` | `untar archivio.tar.xz` |
+| **Creare un archivio `.tar.gz`** | `tar -czvf archivio.tar.gz cartella/` | `tarnow archivio.tar.gz cartella/` |
 
 ---
 
@@ -255,6 +339,70 @@ CachyOS è configurato con il filesystem **Btrfs** e crea uno snapshot (fotograf
   2. Nel menu iniziale di **GRUB**, seleziona la voce **CachyOS Snapshots**.
   3. Scegli lo snapshot della data/ora precedente all'aggiornamento e premi Invio.
   4. Il computer si avvierà tornando indietro nel tempo in 5 secondi, permettendoti di ripristinarlo con un clic.
+
+---
+
+## 8. Sblocco Facciale (Windows Hello con Creative RealSense & Howdy Next)
+
+Sul tuo HUAWEI MateBook D 15 puoi usare la telecamera esterna **Creative RealSense 3D** (dotata di sensori Intel RealSense e microfono integrato) per sbloccare il sistema con il riconoscimento del volto, esattamente come Windows Hello.
+
+Il software utilizzato è **`howdy-next`**, una reimplementazione moderna e ultra-veloce in C++ che sfrutta le reti neurali di OpenCV (**YuNet** per il rilevamento del volto e **SFace** per il riconoscimento biometrico).
+
+### A. Come attivare lo sblocco facciale la prima volta
+Nel percorso `~/Scrivania/Universita/LINUX/` è pronto lo script automatizzato:
+```bash
+cd ~/Scrivania/Universita/LINUX
+./configura-sblocco-facciale.sh
+```
+Lo script installerà `howdy-next`, scaricherà i modelli IA, collegherà la telecamera `/dev/video2` e ti guiderà nella registrazione del volto.
+
+---
+
+### B. Dove funziona lo sblocco facciale
+* **Schermata di Blocco KDE Plasma (`Meta + L`):** Quando blocchi lo schermo o riapri il laptop, guardando la telecamera lo schermo si sbloccherà istantaneamente.
+* **Comandi `sudo` nel Terminale:** Quando lanci un comando con privilegi di amministratore, la telecamera riconoscerà il tuo viso ed eseguirà il comando senza dover digitare la password.
+* **Finestre grafiche di autorizzazione (Polkit):** Quando un'applicazione (es. Octopi, KDE Partition Manager) richiede la password di root, il volto ti autenticherà all'istante.
+
+---
+
+### C. Sicurezza & Funzionamento Senza Telecamera (All'Università)
+> [!IMPORTANT]
+> **Nessun rischio di rimanere bloccati fuori dal PC:**  
+> Il modulo PAM è configurato con la direttiva `sufficient` e timeout breve (4 secondi).  
+> * Se la telecamera USB **non è collegata** (es. quando porti il computer all'università), Howdy salta la scansione silenziosamente.
+> * Se la stanza è troppo buia o il viso non viene riconosciuto, comparirà immediatamente il **consueto campo per inserire la password**.
+
+---
+
+### D. Comandi Utili per Gestire il Riconoscimento Facciale
+
+| Operazione | Comando da Terminale | Descrizione |
+| :--- | :--- | :--- |
+| **Aggiungi un'altra angolazione** | `sudo howdy -U paolo add "viso-occhiali"` | Registra un nuovo scatto (utile se usi occhiali o con luce diversa). |
+| **Lista modelli registrati** | `sudo howdy -U paolo list` | Mostra gli ID e le etichette dei volti salvati. |
+| **Rimuovi uno scatto** | `sudo howdy -U paolo remove <ID>` | Elimina un modello di volto precedentemente registrato. |
+| **Test telecamera & IA** | `sudo howdy test` | Apre la telecamera e mostra in tempo reale se il tuo viso viene riconosciuto. |
+| **Disabilita temporaneamente** | `sudo howdy set disabled true` | Disattiva lo sblocco facciale senza cancellare i volti registrati. |
+| **Riabilita sblocco** | `sudo howdy set disabled false` | Riattiva il funzionamento di Howdy. |
+
+---
+
+## 9. Telecamera 3D Intel RealSense F200 (Sensori di Profondità, Infrarossi e Nuvola di Punti 3D)
+
+La tua telecamera Creative/Intel è equipaggiata con un modulo **Intel RealSense 3D F200 (IVCAM 1.0)** con proiettore laser a infrarossi e sensore di profondità stereoscopico.
+
+Per utilizzarla su Linux CachyOS è installato l'ambiente completo **`librealsense-legacy`** con pieno supporto per tutti i flussi hardware.
+
+### Programmi Grafici Pronti all'Uso
+
+Puoi avviarli dal menu applicazioni di KDE oppure tramite gli script pronti in `~/Scrivania/Universita/LINUX/`:
+
+| Applicazione | Comando Rapido | Script Launcher | Descrizione |
+| :--- | :--- | :--- | :--- |
+| **Nuvola di Punti 3D** | `realsense-pointcloud` | `./avvia-nuvola-3d.sh` | Mostra la mesh 3D interattiva dell'ambiente in tempo reale. Usa il mouse per ruotare (clic sinistro + trascina) e zoomare (rotellina). |
+| **Monitor Multi-Sensore** | `realsense-capture` | `./avvia-monitor-sensori.sh` | Visualizza contemporaneamente in 3 riquadri il canale Profondità a colori, il canale Infrarossi notturno e il canale RGB ad alta risoluzione. |
+| **Pannello di Controllo F200** | `realsense-config-ui` | `./avvia-controllo-f200.sh` | Pannello interattivo per regolare la potenza del laser IR, la soglia di confidenza di profondità, i filtri di smoothing, l'esposizione e gli FPS. |
+| **Info Hardware Sensori** | `realsense-enumerate-devices` | - | Ispeziona seriale, versione firmware (2.60), risoluzioni e angoli di visuale FOV di ogni singolo sensore. |
 
 ---
 

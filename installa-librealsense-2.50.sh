@@ -1,0 +1,1 @@
+/home/paolo/Scrivania/Universita/LINUX/librealsense-2.50/installa-2.50.sh
