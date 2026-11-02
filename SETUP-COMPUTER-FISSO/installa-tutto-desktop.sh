@@ -48,6 +48,20 @@ sudo systemctl enable --now nvidia-suspend.service 2>/dev/null || true
 sudo systemctl enable --now nvidia-hibernate.service 2>/dev/null || true
 sudo systemctl enable --now nvidia-resume.service 2>/dev/null || true
 
+# Configurazione I2C/SMBus per RAM Corsair Vengeance su scheda madre Gigabyte X570
+echo "Configurazione moduli I2C e sblocco SMBus per RAM Corsair RGB..."
+sudo modprobe i2c-dev 2>/dev/null || true
+sudo modprobe i2c-piix4 2>/dev/null || true
+echo "i2c-dev" | sudo tee /etc/modules-load.d/i2c.conf >/dev/null
+echo "i2c-piix4" | sudo tee -a /etc/modules-load.d/i2c.conf >/dev/null
+sudo usermod -aG i2c "$USER" 2>/dev/null || true
+
+# Risolvi conflitto ACPI Gigabyte X570 nel bootloader GRUB
+if ! grep -q "acpi_enforce_resources=lax" /etc/default/grub 2>/dev/null; then
+    sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="acpi_enforce_resources=lax /' /etc/default/grub
+    sudo grub-mkconfig -o /boot/grub/grub.cfg 2>/dev/null || true
+fi
+
 # ------------------------------------------------------------------------------
 # 3. Installazione Applicazioni Ufficiali (Pacman)
 # ------------------------------------------------------------------------------
@@ -62,7 +76,14 @@ sudo pacman -S --needed --noconfirm \
     kate \
     filelight \
     btop fastfetch \
-    flatpak
+    flatpak \
+    openrgb \
+    coolercontrol coolercontrold \
+    openrazer-daemon python-openrazer
+
+# Avvio servizio controllo ventole e permessi per periferiche Razer
+sudo systemctl enable --now coolercontrold.service 2>/dev/null || true
+sudo gpasswd -a "$USER" openrazer 2>/dev/null || true
 
 # ------------------------------------------------------------------------------
 # 4. Installazione Applicazioni da AUR (yay)
@@ -77,6 +98,8 @@ AUR_PACKAGES=(
     parsec-bin
     stremio
     notepadqq
+    polychromatic
+    headsetcontrol
 )
 
 # Tenta prima l'installazione cumulativa, con fallback pacchetto per pacchetto in caso di problemi
@@ -297,6 +320,12 @@ APPS=(
   "md-viewer.desktop"
   "antigravity.desktop"
   "reboot-to-windows.desktop"
+  "org.openrgb.OpenRGB.desktop"
+  "openrgb.desktop"
+  "org.coolercontrol.CoolerControl.desktop"
+  "coolercontrol.desktop"
+  "polychromatic.desktop"
+  "nvidia-settings.desktop"
   "ai.storyteller.artcraft-launcher.desktop"
   "ai.storyteller.deckcraft.desktop"
   "ai.storyteller.gridcraft.desktop"
