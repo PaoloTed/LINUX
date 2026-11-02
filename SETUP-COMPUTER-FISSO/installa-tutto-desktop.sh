@@ -22,7 +22,7 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 # 1. Aggiornamento Sistema e Toolchain di base
 # ------------------------------------------------------------------------------
 echo ""
-echo "[1/10] Aggiornamento completo del sistema e toolchain base..."
+echo "[1/11] Aggiornamento completo del sistema e toolchain base..."
 sudo pacman -Syu --noconfirm --needed base-devel git
 
 # Verifica/installazione di yay (AUR helper)
@@ -35,7 +35,7 @@ fi
 # 2. Driver e Ottimizzazioni Hardware Desktop (AMD Ryzen + NVIDIA RTX 3070 Ti)
 # ------------------------------------------------------------------------------
 echo ""
-echo "[2/10] Controllo e ottimizzazione driver NVIDIA RTX 3070 Ti & AMD..."
+echo "[2/11] Controllo e ottimizzazione driver NVIDIA RTX 3070 Ti & AMD..."
 sudo pacman -S --needed --noconfirm \
     amd-ucode \
     nvidia-utils \
@@ -52,7 +52,7 @@ sudo systemctl enable --now nvidia-resume.service 2>/dev/null || true
 # 3. Installazione Applicazioni Ufficiali (Pacman)
 # ------------------------------------------------------------------------------
 echo ""
-echo "[3/10] Installazione applicazioni ufficiali da Pacman..."
+echo "[3/11] Installazione applicazioni ufficiali da Pacman..."
 sudo pacman -S --needed --noconfirm \
     nodejs npm \
     obs-studio \
@@ -69,7 +69,7 @@ sudo pacman -S --needed --noconfirm \
 # 4. Installazione Applicazioni da AUR (yay)
 # ------------------------------------------------------------------------------
 echo ""
-echo "[4/10] Installazione applicazioni universitarie, comunicazione e media (AUR)..."
+echo "[4/11] Installazione applicazioni universitarie, comunicazione e media (AUR)..."
 yay -S --needed --noconfirm \
     vesktop-bin \
     zapzap-bin \
@@ -82,7 +82,7 @@ yay -S --needed --noconfirm \
 # 5. Configurazione Flatpak & ArtCraft Suite
 # ------------------------------------------------------------------------------
 echo ""
-echo "[5/10] Configurazione Flatpak e installazione ArtCraft..."
+echo "[5/11] Configurazione Flatpak e installazione ArtCraft..."
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null || true
 
 if [ -f "$ASSETS_DIR/artcraft-launcher-0.10.0-linux-x86_64.flatpak" ]; then
@@ -94,7 +94,7 @@ fi
 # 6. Creazione Struttura Cartelle Desktop (Esatta copia del Laptop)
 # ------------------------------------------------------------------------------
 echo ""
-echo "[6/10] Creazione della struttura cartelle Desktop e utente..."
+echo "[6/11] Creazione della struttura cartelle Desktop e utente..."
 mkdir -p "$HOME/Scrivania/Personale"
 mkdir -p "$HOME/Scrivania/Programmi"
 mkdir -p "$HOME/Scrivania/Universita"
@@ -107,7 +107,7 @@ mkdir -p "$HOME/.local/share/icons/hicolor/512x512/apps"
 # 7. Installazione MD Viewer (Markdown Viewer)
 # ------------------------------------------------------------------------------
 echo ""
-echo "[7/10] Installazione e configurazione di MD Viewer..."
+echo "[7/11] Installazione e configurazione di MD Viewer..."
 if [ -f "$ASSETS_DIR/md-viewer-0.3.0-linux-x86_64.tar.gz" ]; then
     mkdir -p "$HOME/.local/share/md-viewer"
     tar -zxvf "$ASSETS_DIR/md-viewer-0.3.0-linux-x86_64.tar.gz" -C "$HOME/.local/share/md-viewer/" >/dev/null 2>&1
@@ -134,7 +134,7 @@ fi
 # 8. Configurazione Scorciatoia "Riavvia in Windows" (Dual Boot)
 # ------------------------------------------------------------------------------
 echo ""
-echo "[8/10] Rilevamento Dual Boot Windows e configurazione 'Riavvia in Windows'..."
+echo "[8/11] Rilevamento Dual Boot Windows e configurazione 'Riavvia in Windows'..."
 
 # Copia l'icona di Windows
 if [ -f "$ASSETS_DIR/windows.svg" ]; then
@@ -193,7 +193,7 @@ sudo timedatectl set-local-rtc 1 --adjust-system-clock
 # 9. Personalizzazione KDE Plasma (Sfondo, Tema Breeze Dark, Velocità)
 # ------------------------------------------------------------------------------
 echo ""
-echo "[9/10] Applicazione tema KDE Breeze Dark e sfondo originale..."
+echo "[9/11] Applicazione tema KDE Breeze Dark e sfondo originale..."
 
 # Copia lo sfondo north-1080p.png
 if [ -f "$ASSETS_DIR/north-1080p.png" ]; then
@@ -222,7 +222,7 @@ fi
 # 10. Popolamento Cartella "Programmi" sul Desktop
 # ------------------------------------------------------------------------------
 echo ""
-echo "[10/10] Popolamento della cartella 'Programmi' sul Desktop..."
+echo "[10/11] Popolamento della cartella 'Programmi' sul Desktop..."
 DESKTOP_DIR="$HOME/Scrivania/Programmi"
 
 APPS=(
@@ -266,6 +266,15 @@ done
 update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
 kbuildsycoca6 2>/dev/null || true
 
+# ------------------------------------------------------------------------------
+# 11. Configurazione Icone Fissate nella Barra delle Applicazioni (Taskbar)
+# ------------------------------------------------------------------------------
+echo ""
+echo "[11/11] Configurazione icone fissate nella barra delle applicazioni (Taskbar)..."
+if [ -f "$SCRIPT_DIR/applica-icone-barra.sh" ]; then
+    bash "$SCRIPT_DIR/applica-icone-barra.sh" || true
+fi
+
 echo ""
 echo "======================================================================"
 echo "    INSTALLAZIONE COMPLETATA CON SUCCESSO SUL TUO COMPUTER FISSO!"
@@ -276,5 +285,6 @@ echo " 2. Tutti i programmi installati con le stesse cartelle del laptop"
 echo " 3. Sfondo 'north-1080p.png' e tema Breeze Dark impostati"
 echo " 4. Cartelle 'Personale', 'Programmi', 'Universita' create sul Desktop"
 echo " 5. Tasto 'Riavvia in Windows' pronto all'uso sulla Scrivania"
+echo " 6. Icone della barra delle applicazioni fissate identiche al portatile"
 echo "======================================================================"
 
